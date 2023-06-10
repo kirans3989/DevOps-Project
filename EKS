@@ -1,1 +1,34 @@
 
+pipeline {
+  agent any
+  
+  stages {
+    stage('Deploy EKS Cluster') {
+      steps {
+        script {
+          // Path to the shell script on the Jenkins server
+          def scriptPath = '/var/lib/jenkins/workspace/EKS/01-ekscluster.sh'
+          
+          // Execute the shell script
+          sh "bash ${scriptPath}"
+        }
+      }
+    }
+    
+   stage('Second Stage') {
+      when {
+        expression { currentBuild.result == 'SUCCESS' }
+      }
+      steps {
+        // Add steps for the second stage here
+        script {
+          // Path to the shell script on the Jenkins server
+          def scriptPath = '/var/lib/jenkins/workspace/EKS/02-iamoidc_eks.sh'
+          
+          // Execute the shell script
+          sh "bash ${scriptPath}"
+        }
+      }
+    } 
+  }
+}
